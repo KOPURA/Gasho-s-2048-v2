@@ -1,4 +1,4 @@
-# Gasho-s-2048-v2
+# Gasho's 2048 V2
 This is a project for the Multimedia Applications course @ New Bulgaria University
 
 Preliminary Plan:
