@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>Gasho's 2048 V2</title>
+	<meta charset="utf-8">
+	<meta name="author" content="Christopher Mitov">
+
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script type="module">
+		import { main } from './js/main.js';
+		$(document).ready(function() {
+			main();
+		})
+	</script>
+
+	<link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+	<div id="central">
+		<div id="score">Score: <span id="score-placeholder">0</span></div>
+		<div id="outer-container">
+			<div id="board-container">
+				<div class="tile-row">
+					<div class="tile-placeholder"></div>
+					<div class="tile-placeholder"></div>
+					<div class="tile-placeholder"></div>
+					<div class="tile-placeholder"></div>
+				</div>
+				<div class="tile-row">
+					<div class="tile-placeholder"></div>
+					<div class="tile-placeholder"></div>
+					<div class="tile-placeholder"></div>
+					<div class="tile-placeholder"></div>
+				</div>
+				<div class="tile-row">
+					<div class="tile-placeholder"></div>
+					<div class="tile-placeholder"></div>
+					<div class="tile-placeholder"></div>
+					<div class="tile-placeholder"></div>
+				</div>
+				<div class="tile-row">
+					<div class="tile-placeholder"></div>
+					<div class="tile-placeholder"></div>
+					<div class="tile-placeholder"></div>
+					<div class="tile-placeholder"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
