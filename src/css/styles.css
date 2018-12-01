@@ -1,67 +1,116 @@
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-	background-color: #e8dbc4;
+    background-color: #e8dbc4;
 }
 
 #central {
-	margin: auto;
-	width: 495px;
+    margin: auto;
+    width: 495px;
+    font-family: "Arial Black", Gadget, sans-serif;
+}
+
+#console {
+    margin: 10px 0 20px 0;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+#console::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.console-element {
+    background: #948c7e;
+    border-radius: 5px;
+    height: 50px;
+    padding: 10px;
 }
 
 #score {
-	margin: 10px 0 20px 0;
-	background: #948c7e;
-	border-radius: 5px;
-	padding: 10px;
-	height: 50px;
-	width: 50%;
-	color: #ded6c9;
-	font-family: "Arial Black", Gadget, sans-serif;
-	font-weight: bold;
-	font-size: 22px;
+    width: 50%;
+    float: left;
+    color: #ded6c9;
 }
 
 #score-placeholder {
-	color: #ffffff;
+    color: #ffffff;
+}
+
+#new-game-button {
+    width: 40%;
+    float: right;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+#new-game-button:hover {
+    color: #dedcd6;
 }
 
 #outer-container {
-	border-radius: 5px;
-	padding: 15px;
-	width: 495px;
-	height: 495px;
-	background-color: #948c7e;
+    border-radius: 5px;
+    padding: 15px;
+    width: 495px;
+    height: 495px;
+    background-color: #948c7e;
 }
 
 #board-container {
-	width: 465px;
-	height: 465px;
+    width: 465px;
+    height: 465px;
 }
 
 .tile-row {
-	margin-bottom: 15px;
-	width: 100%;
-	height: 105px;
+    margin-bottom: 15px;
+    width: 100%;
+    height: 105px;
 }
 
 .tile-row:last-child {
-	margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 .tile-placeholder {
-	width: 105px;
-	height: 105px;
-	margin-right: 15px;
-	border-radius: 3px;
-	background-color: #ccc3b4;
-	float: left;
+    width: 105px;
+    height: 105px;
+    margin-right: 15px;
+    border-radius: 3px;
+    background-color: #ccc3b4;
+    float: left;
 }
 
 .tile-placeholder:last-child {
-	margin-right: 0;
+    margin-right: 0;
 }
+
+.tile {
+    width: 100%;
+    height: 100%;
+    line-height: 105px;
+    border-radius: 3px;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+    font-size: 35px;
+}
+
+.tile-num-2 { color: rgb(247, 245, 242); background-color: rgb(204, 191, 180); }
+.tile-num-4 { color : rgb(117, 109, 100); background-color: rgb(235, 225, 216); }
+.tile-num-8 { color: rgb(117, 109, 100); background-color: rgb(235, 222, 199); }
+.tile-num-16 { color: rgb(247, 245, 242); background-color: rgb(240, 174, 120); }
+.tile-num-32 { color: rgb(247, 245, 242); background-color: rgb(242, 147, 99); }
+.tile-num-64 { color: rgb(247, 245, 242); background-color: rgb(245, 123, 95); }
+.tile-num-128 { color: rgb(247, 245, 242); background-color: rgb(245, 93, 59); }
+.tile-num-256 { color: rgb(247, 245, 240); background-color: rgb(235, 204, 113); }
+.tile-num-512 { color: rgb(247, 245, 240); background-color: rgb(235, 200, 96); }
+.tile-num-1024 { color: rgb(247, 245, 240); background-color: rgb(235, 196, 80); }
+.tile-num-2048 { color: rgb(246, 245, 242); background-color: rgb(235, 195, 63); }
+.tile-num-4096 { color: rgb(246, 245, 242); background-color: rgb(235, 195, 63); }
+.tile-num-8192 { color: rgb(242, 238, 235); background-color: rgb(54, 50, 42); }
