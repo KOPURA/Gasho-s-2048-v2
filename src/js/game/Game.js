@@ -75,7 +75,6 @@ export class Game {
 
     _move(aStartIndices, iStep, fnOperation) {
         let bHasBoardChanged = false;
-        let mTransitionMap = {};
 
         for (let i = 0; i < aStartIndices.length; i++) {
             let currIndex = aStartIndices[i];
@@ -87,12 +86,11 @@ export class Game {
                 if (this.board[currIndex]) continue;// This is not a free position, just continue
 
                 let aRange = Util.generateRange(j + 1, this.size).map(x => aRelevantIndices[x]);
-                let nextElementIdx = Util.first(aRange, x => this.board[x]); // Get the first element != null
-                if (!nextElementIdx) break; // Nothing to move
+                let nextElementIdx =  Util.first(aRange, x => this.board[x]); // Get the first element != null
+                if (nextElementIdx == null) break; // Nothing to move
 
                 this.board[currIndex] = this.board[nextElementIdx];
                 this.board[nextElementIdx] = null;
-                mTransitionMap[nextElementIdx] = currIndex;
                 bHasBoardChanged = true;
             }
 
