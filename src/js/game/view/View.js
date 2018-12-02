@@ -5,6 +5,7 @@
 import { Util } from '../Util.js';
 
 const sBoardContainerID = 'board-container';
+const sScorePlaceholderID = 'score-placeholder';
 const sTilePlaceholderClass = 'tile-placeholder';
 const sTileClass = 'tile';
 
@@ -18,28 +19,33 @@ export class GameView {
         return this._container;
     }
 
-    getAllTiles() {
-        return this.container.find('.' + sTileClass);
-    }
-
     getPlaceholders() {
         return this.container.find('.' + sTilePlaceholderClass);
     }
 
-    getPlaceholderByIndex(i) {
-        return this.getPlaceholders()[i];
+    getPlaceholderByIndex(iIndex) {
+        return this.getPlaceholders()[iIndex];
     }
 
-    intialize() {
-        this.getAllTiles().remove();
-    }
-
-    placeTile(number, position) {
-        let sAdditionalClass = Util.getStyleClassByNumber(number);
-        let oPlaceholder = this.getPlaceholderByIndex(position);
+    notifyBoardPositionChanged(iPosition, iNumber) {
+        let sAdditionalClass = Util.getStyleClassByNumber(iNumber);
+        let oPlaceholder = this.getPlaceholderByIndex(iPosition);
         $('<div/>', {
             class: 'tile ' + sAdditionalClass,
-            text: number,
+            text: iNumber,
         }).hide().appendTo(oPlaceholder).fadeIn();
+    }
+
+    notifyBoardChanged(aNewBoard) {
+        let that = this;
+        $.each(aNewBoard, function(iIdx, oTile) {
+            $(that.getPlaceholderByIndex(iIdx)).empty();
+            if (oTile)
+                that.notifyBoardPositionChanged(iIdx, oTile.number);
+        });
+    }
+
+    notifyScoreChanged(iNewScore) {
+        $('#' + sScorePlaceholderID).html(iNewScore);
     }
 }

@@ -22,6 +22,6 @@ export class Util {
     }
 
     static generateRange(iMin, iMax) {
-        return [...Array(iMax).keys()].map(i => i + iMin);
+        return [...Array(iMax - iMin).keys()].map(i => i + iMin);
     }
 }

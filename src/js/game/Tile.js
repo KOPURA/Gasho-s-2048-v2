@@ -10,7 +10,15 @@ export class Tile {
         return this._number;
     }
 
-    static merge(tileOne, tileTwo) {
-        return new Tile(tileOne.number + tileTwo.nubmer);
+    set number(iNumber) {
+        this._number = iNumber;
+    }
+
+    isEqual(oOtherTile) {
+        return this.number === oOtherTile.number;
+    }
+
+    merge(oOtherTile) {
+        this.number += oOtherTile.number;
     }
 }

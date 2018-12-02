@@ -3,6 +3,16 @@ import { Util } from './game/Util.js';
 
 export function main() {
     let oGame = new Game();
-    // console.log(Util.generateRandomNumber(0,1));
     oGame.intialize();
+
+    document.onkeydown = function(e) {
+        switch(e.key) {
+            case 'ArrowDown' : oGame.moveDown();  break;
+            case 'ArrowUp'   : oGame.moveUp();    break;
+            case 'ArrowRight': oGame.moveRight(); break;
+            case 'ArrowLeft' : oGame.moveLeft();  break;
+            default          : return;
+        }
+        e.preventDefault();
+    }
 }
