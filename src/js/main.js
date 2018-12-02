@@ -15,4 +15,6 @@ export function main() {
         }
         e.preventDefault();
     }
+
+    document.getElementById('new-game-button').onclick = () => oGame.intialize();
 }

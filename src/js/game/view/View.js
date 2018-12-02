@@ -27,13 +27,18 @@ export class GameView {
         return this.getPlaceholders()[iIndex];
     }
 
-    notifyBoardPositionChanged(iPosition, iNumber) {
+    notifyBoardPositionChanged(iPosition, iNumber, bShouldAnimate) {
         let sAdditionalClass = Util.getStyleClassByNumber(iNumber);
         let oPlaceholder = this.getPlaceholderByIndex(iPosition);
-        $('<div/>', {
+        let oNewTileDiv = $('<div/>', {
             class: 'tile ' + sAdditionalClass,
             text: iNumber,
-        }).hide().appendTo(oPlaceholder).fadeIn();
+        });
+        if (bShouldAnimate) {
+            $(oNewTileDiv).hide().appendTo(oPlaceholder).fadeIn();
+        } else {
+            $(oNewTileDiv).appendTo(oPlaceholder);
+        }
     }
 
     notifyBoardChanged(aNewBoard) {
@@ -41,7 +46,7 @@ export class GameView {
         $.each(aNewBoard, function(iIdx, oTile) {
             $(that.getPlaceholderByIndex(iIdx)).empty();
             if (oTile)
-                that.notifyBoardPositionChanged(iIdx, oTile.number);
+                that.notifyBoardPositionChanged(iIdx, oTile.number, false);
         });
     }
 

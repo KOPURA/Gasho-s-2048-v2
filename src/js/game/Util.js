@@ -24,4 +24,13 @@ export class Util {
     static generateRange(iMin, iMax) {
         return [...Array(iMax - iMin).keys()].map(i => i + iMin);
     }
+
+    static first(aArray, fnFilter) {
+        for (let i = 0; i < aArray.length; i++) {
+            let currElement = aArray[i];
+            if (fnFilter(currElement))
+                return currElement;
+        }
+        return null;
+    }
 }

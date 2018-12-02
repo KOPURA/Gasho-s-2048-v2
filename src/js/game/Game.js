@@ -15,6 +15,7 @@ export class Game {
 
     set board(aNewBoard) {
         this._board = aNewBoard;
+        this.view.notifyBoardChanged(aNewBoard);
     }
 
     get size() {
@@ -38,8 +39,6 @@ export class Game {
         // Initialize model
         this.board = Array(this.size * this.size).fill(null);
         this.score = 0;
-        // Initialize view
-        this.view.notifyBoardChanged(this.board);
 /*
     The game always begins with two of the 16 tiles prefilled with either:
     - two 2's
@@ -53,82 +52,82 @@ export class Game {
 
     moveDown() {
         let iBoardSize = this.board.length;
-        let aRelevantIndices = Util.generateRange(iBoardSize - this.size, iBoardSize);
-        this._move(aRelevantIndices, this.size, (a, b) => a - b);
+        let aStartIndices = Util.generateRange(iBoardSize - this.size, iBoardSize);
+        this._move(aStartIndices, this.size, (a, b) => a - b);
     }
 
     moveUp() {
-        let aRelevantIndices = Util.generateRange(0, this.size);
-        this._move(aRelevantIndices, this.size, (a, b) => a + b);
+        let aStartIndices = Util.generateRange(0, this.size);
+        this._move(aStartIndices, this.size, (a, b) => a + b);
     }
 
     moveRight() {
         let iGameSize = this.size;
-        let aRelevantIndices = Util.generateRange(0, iGameSize).map(i => iGameSize*(i + 1) - 1);
-        this._move(aRelevantIndices, 1, (a, b) => a - b);
+        let aStartIndices = Util.generateRange(0, iGameSize).map(i => iGameSize*(i + 1) - 1);
+        this._move(aStartIndices, 1, (a, b) => a - b);
     }
 
     moveLeft() {
         let iGameSize = this.size;
-        let aRelevantIndices = Util.generateRange(0, iGameSize).map(i => i*iGameSize);
-        this._move(aRelevantIndices, 1, (a, b) => a + b);
+        let aStartIndices = Util.generateRange(0, iGameSize).map(i => i*iGameSize);
+        this._move(aStartIndices, 1, (a, b) => a + b);
     }
 
     _move(aStartIndices, iStep, fnOperation) {
+        let bHasBoardChanged = false;
+        let mTransitionMap = {};
+
         for (let i = 0; i < aStartIndices.length; i++) {
             let currIndex = aStartIndices[i];
-            let aRelevantIndices = [];
+            let aRelevantIndices = Util.generateRange(0, this.size).map(x => fnOperation(currIndex, x*iStep));
+
+            // First, move the tiles if there exist free positions, where they can go
             for (let j = 0; j < this.size; j++) {
-                aRelevantIndices.push(fnOperation(currIndex, j*iStep))
+                let currIndex = aRelevantIndices[j];
+                if (this.board[currIndex]) continue;// This is not a free position, just continue
+
+                let aRange = Util.generateRange(j + 1, this.size).map(x => aRelevantIndices[x]);
+                let nextElementIdx = Util.first(aRange, x => this.board[x]); // Get the first element != null
+                if (!nextElementIdx) break; // Nothing to move
+
+                this.board[currIndex] = this.board[nextElementIdx];
+                this.board[nextElementIdx] = null;
+                mTransitionMap[nextElementIdx] = currIndex;
+                bHasBoardChanged = true;
             }
 
-            for (let j = 0; j < aRelevantIndices.length; j++) {
+            for (let j = 0; j < this.size - 1; j++) {
                 let currIndex = aRelevantIndices[j];
-                if (!this.board[currIndex]) {
-                    for (let k = j + 1; k < aRelevantIndices.length; k++) {
-                        let nextIndex = aRelevantIndices[k];
-                        if (this.board[nextIndex]) {
-                            this.board[currIndex] = this.board[nextIndex];
-                            this.board[nextIndex] = null;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            for (let j = 0; j < aRelevantIndices.length - 1; j++) {
-                let currIndex = aRelevantIndices[j];
-                let nextIndex = aRelevantIndices[j+1];
+                let nextIndex = aRelevantIndices[j + 1];
                 if (!this.board[currIndex]) continue;
                 if (!this.board[nextIndex]) continue;
-                if (this.board[currIndex].isEqual(this.board[nextIndex])) {
-                    this.board[currIndex].merge(this.board[nextIndex]);
-                    this.board[nextIndex] = null;
-                    this.score += this.board[currIndex].number;
-                }
-            }
 
-            for (let j = 0; j < aRelevantIndices.length; j++) {
-                let currIndex = aRelevantIndices[j];
-                if (!this.board[currIndex]) {
-                    for (let k = j + 1; k < aRelevantIndices.length; k++) {
-                        let nextIndex = aRelevantIndices[k];
-                        if (this.board[nextIndex]) {
-                            this.board[currIndex] = this.board[nextIndex];
-                            this.board[nextIndex] = null;
-                            break;
-                        }
+                if (this.board[currIndex].isEqual(this.board[nextIndex])) {
+                    this.board[nextIndex] = null;
+                    this.board[currIndex].up();
+                    this.score += this.board[currIndex].number;
+                    bHasBoardChanged = true;
+
+                    // Move the remaining elements after the merge
+                    for (let k = j + 1; k < aRelevantIndices.length - 1; k++) {
+                        currIndex = aRelevantIndices[k];
+                        nextIndex = aRelevantIndices[k + 1];
+                        this.board[currIndex] = this.board[nextIndex]
+                        this.board[nextIndex] = null;
                     }
                 }
             }
         }
-        this.view.notifyBoardChanged(this.board);
-        this._placeRandomTile(); // Do not always place a new tile. If nothing has been moved, skip the new tile
+
+        if (bHasBoardChanged) {
+            this.view.notifyBoardChanged(this.board);
+            this._placeRandomTile();
+        }
     }
 
     _placeTile(oTile, iPosition) {
         this.board[iPosition] = oTile;
-        this.view.notifyBoardPositionChanged(iPosition, oTile.number);
+        this.view.notifyBoardPositionChanged(iPosition, oTile.number, true);
     }
 
     _placeRandomTile() {

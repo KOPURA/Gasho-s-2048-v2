@@ -14,11 +14,11 @@ export class Tile {
         this._number = iNumber;
     }
 
-    isEqual(oOtherTile) {
-        return this.number === oOtherTile.number;
+    up() {
+        this.number *= 2;
     }
 
-    merge(oOtherTile) {
-        this.number += oOtherTile.number;
+    isEqual(oOtherTile) {
+        return this.number === oOtherTile.number;
     }
 }
