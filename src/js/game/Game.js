@@ -81,7 +81,7 @@ export class Game {
             let aRelevantIndices = Util.generateRange(0, this.size).map(x => fnOperation(currIndex, x*iStep));
 
             // First, move the tiles if there exist free positions, where they can go
-            for (let j = 0; j < this.size; j++) {
+            for (let j = 0; j < this.size - 1; j++) {
                 let currIndex = aRelevantIndices[j];
                 if (this.board[currIndex]) continue;// This is not a free position, just continue
 
