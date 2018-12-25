@@ -11,7 +11,8 @@ const sTileClass = 'tile';
 
 export class GameView {
 
-    constructor() {
+    constructor(iGameSize) {
+        this._gameSize = iGameSize;
         this._container = $('#' + sBoardContainerID);
     }
 
@@ -19,15 +20,42 @@ export class GameView {
         return this._container;
     }
 
+    get gameSize() {
+        return this._gameSize;
+    }
+
+    getTileMargin() {
+        let iBoardWidth = this.container.width();
+        let iTileWidth  = this.getTileWidth();
+        let iNumberOfMargins = this.gameSize - 1;
+        return (iBoardWidth - this.gameSize * iTileWidth) / iNumberOfMargins;   
+    }
+
+    // Tile width should be the same as the width of the placeholder
+    getTileWidth() {
+        let oPlaceholder = this.getPlaceholderByIndex(0);
+        return $(oPlaceholder).width();
+    }
+
     getPlaceholders() {
         return this.container.find('.' + sTilePlaceholderClass);
+    }
+
+    getTiles() {
+        return this.container.find('.' + sTileClass);
     }
 
     getPlaceholderByIndex(iIndex) {
         return this.getPlaceholders()[iIndex];
     }
 
-    notifyBoardPositionChanged(iPosition, iNumber, bShouldAnimate) {
+    getTileByIndex(iIndex) {
+        let oPlaceholder = this.getPlaceholderByIndex(iIndex);
+        return $(oPlaceholder).children(0);
+    }
+
+    placeTile(iPosition, oTile, bShouldAnimate) {
+        let iNumber = oTile.number;
         let sAdditionalClass = Util.getStyleClassByNumber(iNumber);
         let oPlaceholder = this.getPlaceholderByIndex(iPosition);
         let oNewTileDiv = $('<div/>', {
@@ -41,12 +69,28 @@ export class GameView {
         }
     }
 
+    notifyBoardPositionChanged(iPosition, oTile, bShouldAnimate) {
+        $(this.getPlaceholderByIndex(iPosition)).empty();
+        if (oTile)
+            this.placeTile(iPosition, oTile, bShouldAnimate);
+    }
+
     notifyBoardChanged(aNewBoard) {
         let that = this;
         $.each(aNewBoard, function(iIdx, oTile) {
-            $(that.getPlaceholderByIndex(iIdx)).empty();
-            if (oTile)
-                that.notifyBoardPositionChanged(iIdx, oTile.number, false);
+            that.notifyBoardPositionChanged(iIdx, oTile, false);
+        });
+    }
+
+    moveTiles(aNewBoard, oTransitionMap) {
+        this.getTiles().stop(true, true); // Finish already running animations
+
+        var that = this;
+        return new Promise(function(resolve, reject) {
+            oTransitionMap.executeAllTransitions(that).then(() => {
+                that.notifyBoardChanged(aNewBoard);
+                resolve();
+            });
         });
     }
 

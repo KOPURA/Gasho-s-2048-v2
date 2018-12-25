@@ -1,11 +1,12 @@
 import { Util } from './Util.js';
 import { Tile } from './Tile.js';
 import { GameView } from './view/View.js';
+import { TransitionMap } from './transition/TransitionMap.js';
 
 export class Game {
     constructor() {
         this._size  = 4; // 4x4
-        this._view  = new GameView();
+        this._view  = new GameView(this._size);
         this._score = 0;
     }
 
@@ -74,58 +75,54 @@ export class Game {
     }
 
     _move(aStartIndices, iStep, fnOperation) {
-        let bHasBoardChanged = false;
+        let oTransitionMap = new TransitionMap(this.size);
+        let that = this;
 
         for (let i = 0; i < aStartIndices.length; i++) {
             let currIndex = aStartIndices[i];
             let aRelevantIndices = Util.generateRange(0, this.size).map(x => fnOperation(currIndex, x*iStep));
 
-            // First, move the tiles if there exist free positions, where they can go
+            // First merge the tiles, which can be merged
             for (let j = 0; j < this.size - 1; j++) {
                 let currIndex = aRelevantIndices[j];
-                if (this.board[currIndex]) continue;// This is not a free position, just continue
-
-                let aRange = Util.generateRange(j + 1, this.size).map(x => aRelevantIndices[x]);
-                let nextElementIdx =  Util.first(aRange, x => this.board[x]); // Get the first element != null
-                if (nextElementIdx == null) break; // Nothing to move
-
-                this.board[currIndex] = this.board[nextElementIdx];
-                this.board[nextElementIdx] = null;
-                bHasBoardChanged = true;
-            }
-
-            for (let j = 0; j < this.size - 1; j++) {
-                let currIndex = aRelevantIndices[j];
-                let nextIndex = aRelevantIndices[j + 1];
                 if (!this.board[currIndex]) continue;
-                if (!this.board[nextIndex]) continue;
+
+                let aNextIndices = Util.generateRange(j + 1, this.size).map(x => aRelevantIndices[x]);
+                let nextIndex = Util.first(aNextIndices, x => this.board[x]); // Get the first element != null
+                if (nextIndex == null) continue;
 
                 if (this.board[currIndex].isEqual(this.board[nextIndex])) {
                     this.board[nextIndex] = null;
                     this.board[currIndex].up();
                     this.score += this.board[currIndex].number;
-                    bHasBoardChanged = true;
-
-                    // Move the remaining elements after the merge
-                    for (let k = j + 1; k < aRelevantIndices.length - 1; k++) {
-                        currIndex = aRelevantIndices[k];
-                        nextIndex = aRelevantIndices[k + 1];
-                        this.board[currIndex] = this.board[nextIndex]
-                        this.board[nextIndex] = null;
-                    }
+                    oTransitionMap.addTransition(nextIndex, currIndex, true);
+                    j++; // Don't try for the next element, it is now null
                 }
+            }
+
+            // Move the tiles if there exist free positions, where they can go
+            for (let j = 0; j < this.size - 1; j++) {
+                let currIndex = aRelevantIndices[j];
+                if (this.board[currIndex]) continue;// This is not a free position, just continue
+
+                let aNextIndices = Util.generateRange(j + 1, this.size).map(x => aRelevantIndices[x]);
+                let nextElementIdx = Util.first(aNextIndices, x => this.board[x]); // Get the first element != null
+                if (nextElementIdx == null) break; // Nothing to move
+
+                this.board[currIndex] = this.board[nextElementIdx];
+                this.board[nextElementIdx] = null;
+                oTransitionMap.addTransition(nextElementIdx, currIndex, false);
             }
         }
 
-        if (bHasBoardChanged) {
-            this.view.notifyBoardChanged(this.board);
+        this.view.moveTiles(this.board, oTransitionMap).then(() => {
             this._placeRandomTile();
-        }
+        });
     }
 
     _placeTile(oTile, iPosition) {
         this.board[iPosition] = oTile;
-        this.view.notifyBoardPositionChanged(iPosition, oTile.number, true);
+        this.view.notifyBoardPositionChanged(iPosition, oTile, true);
     }
 
     _placeRandomTile() {
@@ -146,4 +143,6 @@ export class Game {
         let iFreeIndices = Util.generateRange(0, iBoardSize).filter(i => !this.board[i]);
         return Util.randomPick(iFreeIndices);
     }
+
+    _isOver() {} // Implement
 }

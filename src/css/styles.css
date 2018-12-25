@@ -84,6 +84,7 @@ body {
     border-radius: 3px;
     background-color: #a9a397;
     float: left;
+    position: relative;
 }
 
 .tile-placeholder:last-child {
@@ -99,6 +100,8 @@ body {
     vertical-align: middle;
     font-weight: bold;
     font-size: 35px;
+    position: absolute;
+    z-index: 999;
 }
 
 .tile-num-2 { color: rgb(247, 245, 242); background-color: rgb(204, 191, 180); }
