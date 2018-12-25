@@ -85,7 +85,7 @@ export class GameView {
     moveTiles(aNewBoard, oTransitionMap) {
         this.getTiles().stop(true, true); // Finish already running animations
 
-        var that = this;
+        let that = this;
         return new Promise(function(resolve, reject) {
             oTransitionMap.executeAllTransitions(that).then(() => {
                 that.notifyBoardChanged(aNewBoard);
