@@ -93,7 +93,7 @@ export class Game {
     }
 
     _move(aStartIndices, iStep, fnOperation) {
-        if (this._isOver) return;
+        if (this.isOver) return;
 
         let oTransitionMap = new TransitionMap(this.size);
         for (let i = 0; i < aStartIndices.length; i++) {
