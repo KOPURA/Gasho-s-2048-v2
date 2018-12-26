@@ -1,4 +1,5 @@
-const AnimationDirections = {
+const iSingleTransitionDuration = 120; // milliseconds
+const mAnimationDirections = {
     LEFT:  'left',
     RIGHT: 'right',
     UP:    'top',
@@ -23,9 +24,9 @@ export class Transition {
     getDirection(oView) {
         if (this.from % oView.gameSize === this.to % oView.gameSize) {
             // One is Above the other
-            return this.from > this.to ? AnimationDirections.UP : AnimationDirections.DOWN;
+            return this.from > this.to ? mAnimationDirections.UP : mAnimationDirections.DOWN;
         } else {
-            return this.from > this.to ? AnimationDirections.LEFT : AnimationDirections.RIGHT;
+            return this.from > this.to ? mAnimationDirections.LEFT : mAnimationDirections.RIGHT;
         }
     }
 
@@ -33,7 +34,7 @@ export class Transition {
         let iTileWidth = oView.getTileWidth();
         let iMarginWidth = oView.getTileMargin(); 
         let iStep = 0;
-        if (sDirection === AnimationDirections.UP || sDirection === AnimationDirections.DOWN) {
+        if (sDirection === mAnimationDirections.UP || sDirection === mAnimationDirections.DOWN) {
             iStep = Math.abs(this.from - this.to) / oView.gameSize;
         } else {
             iStep = Math.abs(this.from - this.to);
@@ -54,7 +55,7 @@ export class Transition {
         let mAnimationMap = this.determineAnimationMap(oView);
 
         return oTile.animate(mAnimationMap, {
-            duration: 100,
+            duration: iSingleTransitionDuration,
             queue: false,
             easing: 'linear',
         }).promise();

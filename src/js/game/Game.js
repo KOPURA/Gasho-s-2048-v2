@@ -4,10 +4,13 @@ import { GameView } from './view/View.js';
 import { TransitionMap } from './transition/TransitionMap.js';
 
 export class Game {
-    constructor() {
-        this._size  = 4; // 4x4
-        this._view  = new GameView(this._size);
+
+    constructor(iGameSize) {
+        this._size  = iGameSize; // 4x4
         this._score = 0;
+        this._view  = new GameView(iGameSize);
+
+        this.initialize();
     }
 
     get board() {
@@ -36,10 +39,25 @@ export class Game {
         this.view.notifyScoreChanged(iNewScore);
     }
 
-    intialize() {
+    get isOver() {
+        return this._isOver;
+    }
+
+    set isOver(bIsOver) {
+        this._isOver = bIsOver;
+        if (this._isOver) {
+            this.view.notifyGameOver();
+        } else {
+            this.view.notifyNewGame();
+        }
+    }
+
+    initialize() {
         // Initialize model
         this.board = Array(this.size * this.size).fill(null);
         this.score = 0;
+        this.isOver = false;
+
 /*
     The game always begins with two of the 16 tiles prefilled with either:
     - two 2's
@@ -75,9 +93,9 @@ export class Game {
     }
 
     _move(aStartIndices, iStep, fnOperation) {
-        let oTransitionMap = new TransitionMap(this.size);
-        let that = this;
+        if (this._isOver) return;
 
+        let oTransitionMap = new TransitionMap(this.size);
         for (let i = 0; i < aStartIndices.length; i++) {
             let currIndex = aStartIndices[i];
             let aRelevantIndices = Util.generateRange(0, this.size).map(x => fnOperation(currIndex, x*iStep));
@@ -116,19 +134,21 @@ export class Game {
         }
 
         this.view.moveTiles(this.board, oTransitionMap).then(() => {
-            this._placeRandomTile();
+            this._placeRandomTile().then(() => {
+                this.isOver = this._checkIsOver()
+            });
         });
     }
 
     _placeTile(oTile, iPosition) {
         this.board[iPosition] = oTile;
-        this.view.notifyBoardPositionChanged(iPosition, oTile, true);
+        return this.view.notifyBoardPositionChanged(iPosition, oTile, true);
     }
 
     _placeRandomTile() {
         let iPos = this._generateRandomFreePosition();
         let oTile = this._generateRandomTile();
-        this._placeTile(oTile, iPos);
+        return this._placeTile(oTile, iPos);
     }
 
     _generateRandomTile() {
@@ -144,5 +164,40 @@ export class Game {
         return Util.randomPick(iFreeIndices);
     }
 
-    _isOver() {} // Implement
+    _isFull() {
+        return this.board.filter(t => !t).length === 0;
+    }
+
+    _getNeighbours(iIndex) {
+        let aNeighbours = [];
+        // Check tile above
+        if ((iIndex - this.size) >= 0)
+            aNeighbours.push(iIndex - this.size);
+        // Check tile below
+        if ((iIndex + this.size) < this.size * this.size)
+            aNeighbours.push(iIndex + this.size);
+        // Check tile on the right
+        if ((iIndex + 1) % this.size) {
+            aNeighbours.push(iIndex + 1);
+        }
+        // Check tile on the left
+        if (iIndex && ((iIndex - 1) % this.size) != (this.size - 1)) {
+            aNeighbours.push(iIndex - 1);
+        }
+        return aNeighbours;
+    }
+
+    _checkIsOver() {
+        if (!this._isFull())
+            return false;
+
+        for (let i = 0; i < this.size * this.size; i++) {
+            let aNeighbours = this._getNeighbours(i);
+            let bHasMatchingNeighbour = aNeighbours.filter(j => this.board[i].isEqual(this.board[j])).length > 0;
+            if (bHasMatchingNeighbour)
+                return false;
+        }
+
+        return true;
+    }
 }

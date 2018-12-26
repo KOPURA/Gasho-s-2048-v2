@@ -5,6 +5,7 @@
 import { Util } from '../Util.js';
 
 const sBoardContainerID = 'board-container';
+const sDialogContainerID = 'dialog-container';
 const sScorePlaceholderID = 'score-placeholder';
 const sTilePlaceholderClass = 'tile-placeholder';
 const sTileClass = 'tile';
@@ -63,16 +64,19 @@ export class GameView {
             text: iNumber,
         });
         if (bShouldAnimate) {
-            $(oNewTileDiv).hide().appendTo(oPlaceholder).fadeIn();
+            return $(oNewTileDiv).hide().appendTo(oPlaceholder).fadeIn().promise();
         } else {
             $(oNewTileDiv).appendTo(oPlaceholder);
+            return Promise.resolve();
         }
     }
 
     notifyBoardPositionChanged(iPosition, oTile, bShouldAnimate) {
         $(this.getPlaceholderByIndex(iPosition)).empty();
         if (oTile)
-            this.placeTile(iPosition, oTile, bShouldAnimate);
+            return this.placeTile(iPosition, oTile, bShouldAnimate);
+
+        return Promise.resolve();
     }
 
     notifyBoardChanged(aNewBoard) {
@@ -83,7 +87,7 @@ export class GameView {
     }
 
     moveTiles(aNewBoard, oTransitionMap) {
-        this.getTiles().stop(true, true); // Finish already running animations
+        this.stopAnimations(); // Finish already running animations
 
         let that = this;
         return new Promise(function(resolve, reject) {
@@ -96,5 +100,17 @@ export class GameView {
 
     notifyScoreChanged(iNewScore) {
         $('#' + sScorePlaceholderID).html(iNewScore);
+    }
+
+    notifyGameOver() {
+        $('#' + sDialogContainerID).show();
+    }
+
+    notifyNewGame() {
+        $('#' + sDialogContainerID).hide();
+    }
+
+    stopAnimations() {
+        this.getTiles().stop(true, true);
     }
 }

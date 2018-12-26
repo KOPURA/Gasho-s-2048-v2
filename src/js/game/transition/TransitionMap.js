@@ -1,7 +1,5 @@
 import { Transition } from './Transition.js';
 
-const singleTransitionDuration = 1000; // milliseconds
-
 export class TransitionMap {
 
     constructor(iGameSize) {
